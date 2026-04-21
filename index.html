@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="우리 궁합은" />
+  <meta name="theme-color" content="#fff0f5" />
+  <meta name="description" content="혈액형 · MBTI로 보는 두 사람의 케미와 궁합 점수" />
+  <title>우리 궁합은 몇 점일까 ✦</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pink: #D4537E;
+      --pink-light: #FBEAF0;
+      --pink-mid: #F4C0D1;
+      --pink-dark: #72243E;
+      --blue: #185FA5;
+      --blue-light: #E6F1FB;
+      --purple: #534AB7;
+      --purple-light: #EEEDFE;
+      --text: #1a1a1a;
+      --text2: #666;
+      --text3: #aaa;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --radius: 18px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f0e8ee;
+        --text2: #b89aaa;
+        --text3: #7a6070;
+        --bg: #1a1020;
+        --card: #241828;
+        --border: rgba(255,255,255,0.08);
+        --pink-light: rgba(212,83,126,0.15);
+        --blue-light: rgba(24,95,165,0.15);
+        --purple-light: rgba(83,74,183,0.15);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { font-family: 'Noto Sans KR', sans-serif; color: var(--text); background: var(--bg); min-height: 100vh; padding-bottom: 40px; }
+
+    .wrap { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+
+    header { text-align: center; padding: 40px 0 28px; }
+    header h1 { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    header p { font-size: 13px; color: var(--text3); margin-top: 6px; }
+
+    .persons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .person-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .person-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 14px; }
+    .person-label.me { color: var(--pink); }
+    .person-label.you { color: var(--blue); }
+
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 12px; color: var(--text3); margin-bottom: 5px; }
+    .field input, .field select {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: 10px; font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; background: var(--bg); color: var(--text);
+      outline: none; transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus { border-color: var(--pink); }
+
+    .calc-btn {
+      width: 100%; padding: 15px; font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px; font-weight: 700; cursor: pointer; border: none;
+      border-radius: var(--radius); margin-bottom: 28px;
+      background: var(--pink); color: white; transition: opacity 0.2s, transform 0.1s;
+    }
+    .calc-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+    .result { display: none; }
+
+    .score-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px 20px; text-align: center; margin-bottom: 14px;
+    }
+    .score-names { font-size: 14px; color: var(--text3); margin-bottom: 16px; }
+    .score-num { font-size: 64px; font-weight: 700; color: var(--pink); line-height: 1; }
+    .score-unit { font-size: 14px; color: var(--text3); margin-top: 4px; }
+    .score-bar-bg { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; margin: 18px 0 14px; }
+    .score-bar-fill { height: 100%; border-radius: 99px; background: var(--pink); width: 0%; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+    .score-emoji { font-size: 28px; margin-bottom: 6px; }
+    .score-comment { font-size: 14px; color: var(--text2); line-height: 1.8; }
+    .score-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+    .tag { font-size: 12px; padding: 4px 12px; border-radius: 99px; }
+    .tag.pink { background: var(--pink-light); color: var(--pink-dark); }
+    .tag.blue { background: var(--blue-light); color: var(--blue); }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .compat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .compat-title { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; margin-bottom: 12px; }
+    .compat-title.good { color: #3B6D11; }
+    .compat-title.bad { color: #A32D2D; }
+    .compat-item { font-size: 13px; color: var(--text2); line-height: 1.7; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .compat-item:last-child { border-bottom: none; }
+
+    .advice-card { background: var(--purple-light); border: 1px solid rgba(83,74,183,0.15); border-radius: var(--radius); padding: 18px; margin-bottom: 20px; }
+    .advice-title { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: var(--purple); margin-bottom: 10px; }
+    .advice-text { font-size: 13px; color: var(--text2); line-height: 1.9; }
+
+    .reset-btn {
+      width: 100%; padding: 13px; font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; cursor: pointer; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--card); color: var(--text2);
+      transition: background 0.15s;
+    }
+    .reset-btn:hover { background: var(--pink-light); }
+
+    .heart-deco { text-align: center; font-size: 22px; margin: 10px 0; letter-spacing: 6px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="heart-deco">♡ ♡ ♡</div>
+    <h1>우리 궁합은 몇 점일까 ✦</h1>
+    <p>혈액형 · MBTI로 보는 두 사람의 케미</p>
+  </header>
+
+  <div class="persons">
+    <div class="person-card">
+      <div class="person-label me">나</div>
+      <div class="field"><label>이름 (별명)</label><input id="n1" type="text" placeholder="예) 윤이" /></div>
+      <div class="field"><label>혈액형</label>
+        <select id="b1">
+          <option value="">선택</option>
+          <option>A형</option><option>B형</option><option>O형</option><option>AB형</option>
+        </select>
+      </div>
+      <div class="field"><label>MBTI</label>
+        <select id="m1">
+          <option value="">선택</option>
+          <option>INFP</option><option>INFJ</option><option>INTP</option><option>INTJ</option>
+          <option>ISFP</option><option>ISFJ</option><option>ISTP</option><option>ISTJ</option>
+          <option>ENFP</option><option>ENFJ</option><option>ENTP</option><option>ENTJ</option>
+          <option>ESFP</option><option>ESFJ</option><option>ESTP</option><option>ESTJ</option>
+        </select>
+      </div>
+    </div>
+    <div class="person-card">
+      <div class="person-label you">상대방</div>
+      <div class="field"><label>이름 (별명)</label><input id="n2" type="text" placeholder="예) 썸남" /></div>
+      <div class="field"><label>혈액형</label>
+        <select id="b2">
+          <option value="">선택</option>
+          <option>A형</option><option>B형</option><option>O형</option><option>AB형</option>
+        </select>
+      </div>
+      <div class="field"><label>MBTI</label>
+        <select id="m2">
+          <option value="">선택</option>
+          <option>INFP</option><option>INFJ</option><option>INTP</option><option>INTJ</option>
+          <option>ISFP</option><option>ISFJ</option><option>ISTP</option><option>ISTJ</option>
+          <option>ENFP</option><option>ENFJ</option><option>ENTP</option><option>ENTJ</option>
+          <option>ESFP</option><option>ESFJ</option><option>ESTP</option><option>ESTJ</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcCompat()">♡ 궁합 확인하기</button>
+
+  <div class="result" id="result">
+    <div class="score-card">
+      <div class="score-names" id="scoreNames"></div>
+      <div class="score-num" id="scoreNum">0</div>
+      <div class="score-unit">점 / 100점</div>
+      <div class="score-bar-bg"><div class="score-bar-fill" id="scoreBar"></div></div>
+      <div class="score-emoji" id="scoreEmoji"></div>
+      <div class="score-comment" id="scoreComment"></div>
+      <div class="score-tags" id="scoreTags"></div>
+    </div>
+
+    <div class="two-col">
+      <div class="compat-card">
+        <div class="compat-title good">잘 맞는 부분</div>
+        <div id="goodList"></div>
+      </div>
+      <div class="compat-card">
+        <div class="compat-title bad">조심할 부분</div>
+        <div id="badList"></div>
+      </div>
+    </div>
+
+    <div class="advice-card">
+      <div class="advice-title">두 사람에게 드리는 조언 ✦</div>
+      <div class="advice-text" id="adviceText"></div>
+    </div>
+
+    <button class="reset-btn" onclick="reset()">↺ 다시 하기</button>
+  </div>
+</div>
+
+<script>
+const BLOOD = {
+  'A형':  {pairs:{'A형':78,'B형':62,'O형':80,'AB형':70}},
+  'B형':  {pairs:{'A형':62,'B형':72,'O형':75,'AB형':82}},
+  'O형':  {pairs:{'A형':80,'B형':75,'O형':68,'AB형':72}},
+  'AB형': {pairs:{'A형':70,'B형':82,'O형':72,'AB형':65}},
+};
+const MBTI_COMPAT = {
+  'INFP':{'ENFJ':95,'ENTJ':88,'INFJ':85,'ENFP':80,'INTJ':78,'INFP':70,'ENTP':75,'ISFP':72,'default':60},
+  'INFJ':{'ENTP':95,'ENFP':90,'INFP':85,'INTJ':82,'ENFJ':80,'INFJ':68,'default':62},
+  'INTP':{'ENTJ':92,'ENFJ':88,'INTJ':80,'ENTP':78,'INFJ':75,'default':60},
+  'INTJ':{'ENFP':95,'ENTP':90,'INFP':78,'INFJ':82,'INTJ':65,'default':62},
+  'ISFP':{'ESFJ':88,'ENFJ':85,'ESTJ':80,'INFP':72,'default':62},
+  'ISFJ':{'ESTP':90,'ESFP':85,'ENFP':80,'ISTJ':75,'default':65},
+  'ISTP':{'ESFJ':88,'ESTJ':82,'ISFJ':72,'default':60},
+  'ISTJ':{'ESFP':90,'ESTP':85,'ISFJ':75,'ISTJ':70,'default':62},
+  'ENFP':{'INTJ':95,'INFJ':90,'ISFJ':80,'ENFP':72,'default':68},
+  'ENFJ':{'INFP':95,'INTP':88,'ISFP':85,'INFJ':80,'default':70},
+  'ENTP':{'INFJ':95,'INTJ':90,'ENFP':78,'ENTP':68,'default':65},
+  'ENTJ':{'INFP':88,'INTP':92,'ENFJ':75,'default':68},
+  'ESFP':{'ISTJ':90,'ISFJ':85,'ESFJ':78,'default':65},
+  'ESFJ':{'ISFP':88,'ISTP':88,'ESFJ':72,'default':67},
+  'ESTP':{'ISFJ':90,'ISTJ':85,'ESTP':68,'default':63},
+  'ESTJ':{'ISFP':80,'ISTP':82,'INFP':70,'default':65},
+};
+const GOODS = {
+  'IN':['깊은 대화를 즐겨요','서로의 내면을 이해해요','조용한 시간도 함께 즐겨요'],
+  'EN':['에너지가 넘치는 대화','새로운 아이디어 공유','활동적인 데이트'],
+  'IS':['안정적인 일상을 함께해요','세심하게 배려해요','신뢰감 있는 관계예요'],
+  'ES':['사교적인 만남을 즐겨요','즉흥적인 재미가 있어요','활발하게 소통해요'],
+  'TJ':['목표를 함께 세워요','서로 발전을 도와요','계획적으로 미래를 설계해요'],
+  'FP':['감정에 충실해요','자유롭게 표현해요','서로의 개성을 존중해요'],
+};
+const BADS = {
+  'EI':['에너지 충전 방식이 달라요','혼자 vs 함께 시간 갈등','사교 활동 선호도가 달라요'],
+  'TF':['논리 vs 감정이 충돌할 수 있어요','위로 방식이 달라요','의사결정 기준이 달라요'],
+  'JP':['계획 vs 즉흥 스타일 갈등','생활 방식이 충돌할 수 있어요','우선순위 인식이 달라요'],
+  'default':['표현 방식이 달라요','가끔 오해가 생길 수 있어요','서로 맞춰가는 연습 필요'],
+};
+
+function getMbtiScore(m1,m2){
+  const d=MBTI_COMPAT[m1];
+  if(!d) return 70;
+  return d[m2]||d['default']||70;
+}
+function getComment(s){
+  if(s>=90) return {emoji:'💘',text:'운명적인 궁합이에요! 서로에게 완벽한 파트너가 될 수 있어요.',tags:['천생연분','케미 폭발','운명의 상대']};
+  if(s>=80) return {emoji:'💖',text:'정말 잘 맞는 두 사람이에요. 함께할수록 더 깊어지는 관계예요.',tags:['찰떡궁합','믿음직한 사이','함께 성장']};
+  if(s>=70) return {emoji:'💕',text:'서로를 알아가면서 더 좋아질 수 있는 궁합이에요. 노력이 빛을 발해요.',tags:['발전형 궁합','가능성 있음']};
+  if(s>=60) return {emoji:'💛',text:'차이점이 있지만, 그것이 오히려 서로를 채워줄 수 있어요.',tags:['보완형 궁합','서로 배우는 사이']};
+  return {emoji:'🤍',text:'쉽지 않은 궁합이지만, 진심이 있다면 충분히 극복 가능해요.',tags:['도전형 궁합','극과 극의 매력']};
+}
+function getGoods(m1,m2){
+  const res=new Set();
+  [m1.slice(0,2),m2.slice(0,2),m1.slice(2),m2.slice(2)].forEach(p=>{
+    if(GOODS[p]) GOODS[p].forEach(i=>res.add(i));
+  });
+  return [...res].slice(0,4);
+}
+function getBads(m1,m2){
+  const res=new Set();
+  if(m1[0]!==m2[0]) BADS['EI'].forEach(i=>res.add(i));
+  if(m1[2]!==m2[2]) BADS['TF'].forEach(i=>res.add(i));
+  if(m1[3]!==m2[3]) BADS['JP'].forEach(i=>res.add(i));
+  if(res.size<2) BADS['default'].forEach(i=>res.add(i));
+  return [...res].slice(0,4);
+}
+function animateScore(target){
+  let cur=0; const el=document.getElementById('scoreNum'), bar=document.getElementById('scoreBar');
+  const step=target/50;
+  const t=setInterval(()=>{
+    cur=Math.min(cur+step,target);
+    el.textContent=Math.round(cur);
+    bar.style.width=Math.round(cur)+'%';
+    if(cur>=target) clearInterval(t);
+  },20);
+}
+function calcCompat(){
+  const n1=document.getElementById('n1').value.trim()||'나';
+  const n2=document.getElementById('n2').value.trim()||'상대방';
+  const b1=document.getElementById('b1').value;
+  const b2=document.getElementById('b2').value;
+  const m1=document.getElementById('m1').value;
+  const m2=document.getElementById('m2').value;
+  if(!b1||!b2||!m1||!m2){alert('혈액형과 MBTI를 모두 선택해주세요!');return;}
+  const bScore=BLOOD[b1].pairs[b2]||70;
+  const mScore=getMbtiScore(m1,m2);
+  const total=Math.round(bScore*0.35+mScore*0.65);
+  const c=getComment(total);
+  document.getElementById('scoreNames').textContent=n1+' ♡ '+n2;
+  document.getElementById('scoreEmoji').textContent=c.emoji;
+  document.getElementById('scoreComment').textContent=c.text;
+  document.getElementById('scoreTags').innerHTML=c.tags.map((t,i)=>`<span class="tag ${i%2===0?'pink':'blue'}">${t}</span>`).join('');
+  document.getElementById('goodList').innerHTML=getGoods(m1,m2).map(g=>`<div class="compat-item">✓ ${g}</div>`).join('');
+  document.getElementById('badList').innerHTML=getBads(m1,m2).map(b=>`<div class="compat-item">△ ${b}</div>`).join('');
+  document.getElementById('adviceText').textContent=`${b1}+${b2} 조합의 두 사람, 서로 다른 점을 인정하는 게 핵심이에요. ${m1}인 ${n1}와 ${m2}인 ${n2}는 표현 방식이 다를 수 있지만, 그 차이가 오히려 서로를 더 특별하게 만들어줘요. 함께하는 루틴을 조금씩 만들어가 보세요.`;
+  const r=document.getElementById('result');
+  r.style.display='block';
+  document.getElementById('scoreBar').style.width='0%';
+  document.getElementById('scoreNum').textContent='0';
+  setTimeout(()=>animateScore(total),150);
+  r.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function reset(){
+  document.getElementById('result').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "우리 궁합은 몇 점일까",
+  "short_name": "궁합테스트",
+  "description": "혈액형 · MBTI로 보는 두 사람의 케미와 궁합 점수",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#D4537E",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
